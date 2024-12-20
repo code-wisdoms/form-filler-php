@@ -1,7 +1,7 @@
 const fs = require("fs");
 const pdfLib = require("pdf-lib");
-const logger = require(__dirname + "/../utils/logger");
-const args = require(__dirname + "/../utils/args");
+const logger = require(__dirname + "/utils/logger");
+const args = require(__dirname + "/utils/args");
 
 logger.info("New request for fill: " + JSON.stringify(process.argv));
 (async () => {
@@ -12,16 +12,15 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
       logger.error("Field values are not specified");
       process.exit(1);
     }
-    if (!opts.form) {
-      logger.error("Form name is not specified");
+    if (!opts.file) {
+      logger.error("File is not specified");
       process.exit(1);
     }
-    const formFilePath = `${__dirname}/../forms/${opts.form}.pdf`
-    if (!fs.existsSync(formFilePath)) {
+    if (!fs.existsSync(opts.file)) {
       logger.error("Form not found");
       process.exit(1);
     }
-    const pdfBuffer = fs.readFileSync(formFilePath);
+    const pdfBuffer = fs.readFileSync(opts.file);
     const pdfDoc = await pdfLib.PDFDocument.load(pdfBuffer);
     const form = pdfDoc.getForm();
 

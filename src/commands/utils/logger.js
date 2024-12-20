@@ -9,7 +9,7 @@ const logger = createLogger({
   level: process.env.LOG_LEVEL ?? "silly",
   transports: [
     new transports.DailyRotateFile({
-      dirname: __dirname + "/../../logs",
+      dirname: __dirname + "/../logs",
       filename: "%DATE%.log",
       datePattern: "YYYY-MM-DD",
       zippedArchive: true,
