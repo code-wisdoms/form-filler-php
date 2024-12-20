@@ -16,6 +16,11 @@ const logger = createLogger({
       level: process.env.LOG_LEVEL ?? "silly",
       format: winstonFormat.combine(winstonFormat.timestamp(), myFormat),
     }),
+    new transports.Console({
+      level: 'error',
+      stderrLevels: ["error"],
+      format: winstonFormat.combine(winstonFormat.timestamp(), myFormat),
+    }),
   ],
 });
 
