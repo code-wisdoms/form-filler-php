@@ -9,7 +9,7 @@ $data = base64_encode(json_encode($data));
 $tempFile = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
 $command = 'node C:/wamp64/www/projects/form-filler/src/index.js';
 
-if (@$_GET['flatten']) {
+if (array_key_exists('flatten', $_GET)) {
     $command .= ' --flatten';
 }
 $command .= " -d $data";
