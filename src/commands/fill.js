@@ -3,7 +3,7 @@ const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/../utils/logger");
 const args = require(__dirname + "/../utils/args");
 
-logger.info("New request: " + JSON.stringify(process.argv));
+logger.info("New request for fill: " + JSON.stringify(process.argv));
 (async () => {
   try {
     const opts = args();
@@ -16,11 +16,12 @@ logger.info("New request: " + JSON.stringify(process.argv));
       logger.error("Form name is not specified");
       process.exit(1);
     }
-    if (!fs.existsSync(`${__dirname}/../forms/${opts.form}.pdf`)) {
+    const formFilePath = `${__dirname}/../forms/${opts.form}.pdf`
+    if (!fs.existsSync(formFilePath)) {
       logger.error("Form not found");
       process.exit(1);
     }
-    const pdfBuffer = fs.readFileSync(`${__dirname}/../forms/${opts.form}.pdf`);
+    const pdfBuffer = fs.readFileSync(formFilePath);
     const pdfDoc = await pdfLib.PDFDocument.load(pdfBuffer);
     const form = pdfDoc.getForm();
 

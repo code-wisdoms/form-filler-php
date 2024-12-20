@@ -3,32 +3,45 @@ const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/../utils/logger");
 const args = require(__dirname + "/../utils/args");
 
-logger.info("New request: " + JSON.stringify(process.argv));
+logger.info("New request for fields: " + JSON.stringify(process.argv));
 (async () => {
   try {
     const opts = args();
     logger.info("with options " + JSON.stringify(opts));
-    const pdfBuffer = fs.readFileSync(__dirname + "/../forms/QMEForm110.pdf");
+    if (!opts.form) {
+      logger.error("Form name is not specified");
+      process.exit(1);
+    }
+    const formFilePath = `${__dirname}/../forms/${opts.form}.pdf`;
+    if (!fs.existsSync(formFilePath)) {
+      logger.error("Form not found");
+      process.exit(1);
+    }
+    const pdfBuffer = fs.readFileSync(formFilePath);
     const pdfDoc = await pdfLib.PDFDocument.load(pdfBuffer);
     const form = pdfDoc.getForm();
-    // const fields = form.getFields();
+    const fields = form.getFields();
 
-    const inputs = JSON.parse(atob(opts.d));
+    const data = fields.map((field) => {
+      const name = field.getName();
+      let type = "unknown";
 
-    for (const key in inputs) {
-      const nameField = form.getTextField(key);
-      nameField.setText(inputs[key]);
-    }
-
-    if (opts.flatten) {
-      form.flatten();
-    }
-
-    const data = await pdfDoc.save();
-    process.stdout.write(data);
+      if (field instanceof pdfLib.PDFTextField) {
+        type = "text";
+      } else if (field instanceof pdfLib.PDFCheckBox) {
+        type = "checkbox";
+      } else if (field instanceof pdfLib.PDFDropdown) {
+        type = "select";
+      } else if (field instanceof pdfLib.PDFRadioGroup) {
+        type = "radio";
+      } else if (field instanceof pdfLib.PDFButton) {
+        type = "button";
+      }
+      return { name, type };
+    });
+    process.stdout.write(JSON.stringify(data));
   } catch (error) {
-    process.stdout.write(error.toString());
-    logger.error(error);
+    logger.error(`Error: ${error}`);
     process.exit(1);
   }
 })();
