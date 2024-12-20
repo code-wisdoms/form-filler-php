@@ -1,8 +1,10 @@
 <?php
+
+use CodeWisdoms\Filler\Exceptions\STDError;
+use CodeWisdoms\Filler\Filler;
+
 require '../../vendor/autoload.php';
 
-use Filler\Exceptions\STDError;
-use Filler\Filler;
 
 $data = [
     'Employer Name' => $_GET['employer_name'],

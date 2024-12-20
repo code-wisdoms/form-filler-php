@@ -1,5 +1,5 @@
 <?php
-namespace Filler\Exceptions;
+namespace CodeWisdoms\Filler\Exceptions;
 class STDError extends \Exception
 {
     private string $stdErrOutput;

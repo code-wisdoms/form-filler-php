@@ -1,5 +1,5 @@
 <?php
-namespace Filler;
+namespace CodeWisdoms\Filler;
 
 use Filler\Exceptions\STDError;
 use Symfony\Component\Process\Exception\ProcessFailedException;
