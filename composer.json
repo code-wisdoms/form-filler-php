@@ -1,10 +1,20 @@
 {
+    "name": "codewisdoms/formfiller",
+    "description": "A wrapper nodejs pdflib to fill PDF embeded forms",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+      "psr-4": {
+        "CodeWisdoms\\Filler\\": "src/Filler"
+      }
+    },
+    "authors": [
+      {
+        "name": "CodeWisdoms"
+      }
+    ],
     "require": {
         "symfony/process": "6.4.15"
-    },
-    "autoload": {
-        "psr-4": {
-            "Filler\\": "src/Filler"
-        }
     }
-}
+  }
+  
