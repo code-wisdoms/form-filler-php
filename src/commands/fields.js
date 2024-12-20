@@ -1,14 +1,14 @@
 const fs = require("fs");
 const pdfLib = require("pdf-lib");
-const logger = require(__dirname + "/utils/logger");
-const args = require(__dirname + "/utils/args");
+const logger = require(__dirname + "/../utils/logger");
+const args = require(__dirname + "/../utils/args");
 
 logger.info("New request: " + JSON.stringify(process.argv));
 (async () => {
   try {
     const opts = args();
     logger.info("with options " + JSON.stringify(opts));
-    const pdfBuffer = fs.readFileSync(__dirname + "/forms/QMEForm110.pdf");
+    const pdfBuffer = fs.readFileSync(__dirname + "/../forms/QMEForm110.pdf");
     const pdfDoc = await pdfLib.PDFDocument.load(pdfBuffer);
     const form = pdfDoc.getForm();
     // const fields = form.getFields();

@@ -4,10 +4,9 @@ const argRegex = new RegExp(/^\-{1}/);
 
 module.exports = () => {
   const args = process.argv.slice(2);
-  logger.debug(args);
+  logger.debug("Args in : " + JSON.stringify(args));
   const opts = {};
   for (const key in args) {
-    logger.debug(key);
     const arg = args[key];
     if (optRegex.test(arg)) {
       logger.debug(`matched opt ${key} | ${arg}`);
@@ -17,10 +16,10 @@ module.exports = () => {
       logger.debug(`matched arg ${key} | ${arg}`);
       opts[arg.replace(argRegex, "")] = args[parseInt(key) + 1];
     } else {
-      logger.debug("Non " + arg);
+      logger.debug("No match: " + arg);
     }
   }
 
-  logger.debug(opts);
+  logger.debug("Opts out: " + JSON.stringify(opts));
   return opts;
 };
