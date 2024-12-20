@@ -25,6 +25,7 @@ logger.info("New request for fields: " + JSON.stringify(process.argv));
     const data = fields.map((field) => {
       const name = field.getName();
       let type = "unknown";
+      let values = [];
 
       if (field instanceof pdfLib.PDFTextField) {
         type = "text";
@@ -32,12 +33,14 @@ logger.info("New request for fields: " + JSON.stringify(process.argv));
         type = "checkbox";
       } else if (field instanceof pdfLib.PDFDropdown) {
         type = "select";
+        values = field.getOptions();
       } else if (field instanceof pdfLib.PDFRadioGroup) {
-        type = "radio";
+          type = "radio";
+          values = field.getOptions();
       } else if (field instanceof pdfLib.PDFButton) {
         type = "button";
       }
-      return { name, type };
+      return { name, type, values };
     });
     process.stdout.write(JSON.stringify(data));
   } catch (error) {
