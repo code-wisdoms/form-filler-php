@@ -85,12 +85,13 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
               const { context } = widget.dict;
               const { width, height } = widget.getRectangle();
 
+              const scl = pdfLibSigImg.scaleToFit(width, height)
               const appearance = [
                 ...drawImage(pdfLibSigImgName, {
                   x: 0,
-                  y: 2,
-                  width: width,
-                  height: height - 2,
+                  y: 0,
+                  width: scl.width,
+                  height: scl.height,
                   rotate: degrees(0),
                   xSkew: degrees(0),
                   ySkew: degrees(0),
