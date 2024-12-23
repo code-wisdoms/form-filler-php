@@ -38,6 +38,12 @@ logger.info("New request for fields: " + JSON.stringify(process.argv));
         values = field.getOptions();
       } else if (field instanceof pdfLib.PDFButton) {
         type = "button";
+      } else if (field instanceof pdfLib.PDFOptionList) {
+        type = "multi-select";
+      } else if (field instanceof pdfLib.PDFSignature) {
+        type = "signature";
+      } else {
+        type = field.constructor.name;
       }
       return { name, type, values };
     });
