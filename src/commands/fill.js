@@ -2,6 +2,7 @@ const fs = require("fs");
 const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/utils/logger");
 const args = require(__dirname + "/utils/args");
+const { drawRectangle, rgb, degrees, drawImage } = require("pdf-lib");
 
 logger.info("New request for fill: " + JSON.stringify(process.argv));
 (async () => {
@@ -68,7 +69,46 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             break;
           }
           case "image": {
-            field.setImage(inputField.value);
+            let pdfLibSigImg = null;
+            if (inputField.mime == "image/jpg") {
+              pdfLibSigImg = await pdfDoc.embedJpg(
+                Buffer.from(inputField.value, "base64")
+              );
+            } else {
+              pdfLibSigImg = await pdfDoc.embedPng(
+                Buffer.from(inputField.value, "base64")
+              );
+            }
+            const pdfLibSigImgName = "PDF_LIB_SIG_IMG";
+            field.acroField.getWidgets().forEach((widget) => {
+              const { context } = widget.dict;
+              const { width, height } = widget.getRectangle();
+
+              const appearance = [
+                ...drawImage(pdfLibSigImgName, {
+                  x: 0,
+                  y: 2,
+                  width: width,
+                  height: height - 2,
+                  rotate: degrees(0),
+                  xSkew: degrees(0),
+                  ySkew: degrees(0),
+                }),
+              ];
+
+              const stream = context.formXObject(appearance, {
+                Resources: {
+                  XObject: {
+                    [pdfLibSigImgName]: pdfLibSigImg.ref,
+                  },
+                },
+                BBox: context.obj([0, 0, width, height]),
+                Matrix: context.obj([1, 0, 0, 1, 0, 0]),
+              });
+              const streamRef = context.register(stream);
+
+              widget.setNormalAppearance(streamRef);
+            });
             break;
           }
         }
@@ -77,32 +117,11 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
       }
     }
 
-    const data = fields.map((field) => {
-      const name = field.getName();
-      let type = "unknown";
-      let values = [];
-
-      if (field instanceof pdfLib.PDFTextField) {
-        type = "text";
-      } else if (field instanceof pdfLib.PDFCheckBox) {
-        type = "checkbox";
-      } else if (field instanceof pdfLib.PDFDropdown) {
-        type = "select";
-        values = field.getOptions();
-      } else if (field instanceof pdfLib.PDFRadioGroup) {
-        type = "radio";
-        values = field.getOptions();
-      } else if (field instanceof pdfLib.PDFButton) {
-        type = "button";
-      }
-      return { name, type, values };
-    });
-
     if (opts.flatten) {
       form.flatten();
     }
 
-    process.stdout.write(await pdfDoc.save());
+    process.stdout.write(await pdfDoc.save({ updateFieldAppearances: false }));
   } catch (error) {
     logger.error(`Error: ${error}`);
     process.exit(1);
