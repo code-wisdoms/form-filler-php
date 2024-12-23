@@ -39,6 +39,7 @@ logger.info("New request for fields: " + JSON.stringify(process.argv));
       } else if (field instanceof pdfLib.PDFButton) {
         type = "button";
       } else if (field instanceof pdfLib.PDFOptionList) {
+        values = field.getOptions();
         type = "multi-select";
       } else if (field instanceof pdfLib.PDFSignature) {
         type = "signature";

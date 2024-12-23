@@ -54,7 +54,12 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             break;
           }
           case "radio": {
-            field.select(inputField.value);
+            if (inputField.index !== undefined) {
+              const opts = field.getOptions();
+              field.select(opts[inputField.index])
+            } else {
+              field.select(inputField.value);
+            }
             break;
           }
           case "checkbox": {
@@ -66,7 +71,12 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             break;
           }
           case "dropdown": {
-            field.select(inputField.value);
+            if (inputField.index !== undefined) {
+              const opts = field.getOptions();
+              field.select(opts[inputField.index])
+            } else {
+              field.select(inputField.value);
+            }
             break;
           }
           case "image": {
