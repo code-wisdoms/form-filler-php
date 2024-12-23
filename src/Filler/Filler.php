@@ -1,7 +1,7 @@
 <?php
 namespace CodeWisdoms\Filler;
 
-use Filler\Exceptions\STDError;
+use CodeWisdoms\Filler\Exceptions\STDError;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
