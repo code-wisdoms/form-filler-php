@@ -37,10 +37,66 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
       process.exit(1);
     }
 
-    for (const key in inputs) {
-      const nameField = form.getTextField(key);
-      nameField.setText(inputs[key]);
+    const fields = form.getFields();
+
+    for (const field of fields) {
+      try {
+        const key = field.getName();
+        const inputField = inputs[key];
+        if (!inputField) {
+          continue;
+        }
+        switch (inputField.type) {
+          case "text": {
+            field.setText(inputField.value);
+            break;
+          }
+          case "radio": {
+            field.select(inputField.value);
+            break;
+          }
+          case "checkbox": {
+            if (!!inputField.value) {
+              field.check();
+            } else {
+              field.uncheck();
+            }
+            break;
+          }
+          case "dropdown": {
+            field.select(inputField.value);
+            break;
+          }
+          case "image": {
+            field.setImage(inputField.value);
+            break;
+          }
+        }
+      } catch (error) {
+        logger.error(`Error: ${error}`);
+      }
     }
+
+    const data = fields.map((field) => {
+      const name = field.getName();
+      let type = "unknown";
+      let values = [];
+
+      if (field instanceof pdfLib.PDFTextField) {
+        type = "text";
+      } else if (field instanceof pdfLib.PDFCheckBox) {
+        type = "checkbox";
+      } else if (field instanceof pdfLib.PDFDropdown) {
+        type = "select";
+        values = field.getOptions();
+      } else if (field instanceof pdfLib.PDFRadioGroup) {
+        type = "radio";
+        values = field.getOptions();
+      } else if (field instanceof pdfLib.PDFButton) {
+        type = "button";
+      }
+      return { name, type, values };
+    });
 
     if (opts.flatten) {
       form.flatten();

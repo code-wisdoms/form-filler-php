@@ -7,7 +7,9 @@ require '../../vendor/autoload.php';
 
 
 $data = [
-    'Employer Name' => $_GET['employer_name'],
+    'Employer Name' => ['type' => 'text', 'value' => $_GET['employer_name']],
+    'Is a certified interpreter required?' => ['type' => 'radio', 'value' => 'Yes'],
+    'Claims Administrator State (Required)' => ['type' => 'dropdown', 'value' => 'CA'],
 ];
 $file_path = __DIR__ . "/forms/{$_GET['form']}.pdf";
 
