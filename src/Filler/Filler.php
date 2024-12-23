@@ -8,11 +8,15 @@ use Symfony\Component\Process\Process;
 
 class Filler
 {
-    private $nodePath;
-    public function __construct()
+    public function __construct(private string | null $nodePath = null, private string | null $npmPath = null)
     {
         $executableFinder = new ExecutableFinder();
-        $this->nodePath = $executableFinder->find('node');
+        if ($nodePath === null) {
+            $this->nodePath = $executableFinder->find('node');
+        }
+        if ($npmPath === null) {
+            $this->npmPath = $executableFinder->find('npm');
+        }
         $this->init($executableFinder);
     }
     private function init(ExecutableFinder $executableFinder)
@@ -22,14 +26,14 @@ class Filler
         }
         try {
             $commands = [];
-            $commands[] = $executableFinder->find('npm');
+            $commands[] = $this->npmPath;
             $commands[] = 'i';
             return $this->execute($commands);
         } catch (\Throwable $e) {
             try {
                 $commands = [];
                 $commands[] = $this->nodePath;
-                $commands[] = $executableFinder->find('npm');
+                $commands[] = $this->npmPath;
                 $commands[] = 'i';
                 return $this->execute($commands);
             } catch (\Throwable $e) {
