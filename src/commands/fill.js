@@ -49,6 +49,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
         }
         switch (inputField.type) {
           case "text": {
+            field.removeMaxLength()
             field.setText(inputField.value);
             break;
           }
