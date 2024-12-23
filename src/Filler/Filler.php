@@ -17,9 +17,9 @@ class Filler
         if ($npmPath === null) {
             $this->npmPath = $executableFinder->find('npm');
         }
-        $this->init($executableFinder);
+        $this->init();
     }
-    private function init(ExecutableFinder $executableFinder)
+    private function init()
     {
         if (is_dir(__DIR__ . '/../commands/node_modules')) {
             return;
