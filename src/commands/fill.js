@@ -49,7 +49,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
         }
         switch (inputField.type) {
           case "text": {
-            field.removeMaxLength()
+            field.removeMaxLength();
             field.setText(inputField.value);
             break;
           }
@@ -119,7 +119,17 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
     }
 
     if (opts.flatten) {
-      form.flatten();
+      if (!opts.hasDOSPage) {
+        form.flatten();
+      } else {
+        const pageCount = pdfDoc.getPageCount();
+        const [dosPage] = await pdfDoc.copyPages(pdfDoc, [pageCount - 1]);
+        pdfDoc.removePage(pageCount - 1);
+
+        form.flatten();
+
+        pdfDoc.addPage(dosPage);
+      }
     }
 
     process.stdout.write(await pdfDoc.save({ updateFieldAppearances: false }));

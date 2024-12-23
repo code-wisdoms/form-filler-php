@@ -45,7 +45,7 @@ class Filler
             }
         }
     }
-    public function fill(string $file_path, array $data, bool $flatten = false): string
+    public function fill(string $file_path, array $data, bool $flatten = false, bool $hasDOSPage = false): string
     {
         $tempFile = tempnam(__DIR__ . '/../commands/', 'dt_');
         file_put_contents($tempFile, $this->encodeData($data));
@@ -56,6 +56,9 @@ class Filler
 
         if ($flatten) {
             $command[] = '--flatten';
+        }
+        if ($hasDOSPage) {
+            $command[] = '--hasDOSPage';
         }
         $command[] = '-file';
         $command[] = $file_path;
