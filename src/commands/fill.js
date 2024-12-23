@@ -12,6 +12,10 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
       logger.error("Field values are not specified");
       process.exit(1);
     }
+    if (!fs.existsSync(opts.d)) {
+      logger.error("Data file not found");
+      process.exit(1);
+    }
     if (!opts.file) {
       logger.error("File is not specified");
       process.exit(1);
@@ -26,7 +30,8 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
 
     let inputs = [];
     try {
-      inputs = JSON.parse(atob(opts.d));
+      const fileData = fs.readFileSync(opts.d);
+      inputs = JSON.parse(fileData);
     } catch (error) {
       logger.error("Unable to parse inputs");
       process.exit(1);

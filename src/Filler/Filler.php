@@ -47,6 +47,9 @@ class Filler
     }
     public function fill(string $file_path, array $data, bool $flatten = false): string
     {
+        $tempFile = tempnam(__DIR__ . '/../commands/', 'dt_');
+        file_put_contents($tempFile, $this->encodeData($data));
+
         $command = [];
         $command[] = $this->nodePath;
         $command[] = __DIR__ . '/../commands/fill.js';
@@ -57,8 +60,11 @@ class Filler
         $command[] = '-file';
         $command[] = $file_path;
         $command[] = '-d';
-        $command[] = $this->encodeData($data);
-        return $this->execute($command);
+        $command[] = $tempFile;
+        $data = $this->execute($command);
+
+        unlink($tempFile);
+        return $data;
     }
     public function getFields(string $file_path): array
     {
@@ -85,6 +91,6 @@ class Filler
     }
     private function encodeData(array $data): string
     {
-        return base64_encode(json_encode($data));
+        return json_encode($data);
     }
 }
