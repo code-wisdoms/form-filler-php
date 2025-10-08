@@ -2,7 +2,7 @@ const fs = require("fs");
 const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/utils/logger");
 const args = require(__dirname + "/utils/args");
-const { drawRectangle, rgb, degrees, drawImage } = require("pdf-lib");
+const { degrees, drawImage } = require("pdf-lib");
 
 logger.info("New request for fill: " + JSON.stringify(process.argv));
 (async () => {
@@ -56,7 +56,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
           case "radio": {
             if (inputField.index !== undefined) {
               const opts = field.getOptions();
-              field.select(opts[inputField.index])
+              field.select(opts[inputField.index]);
             } else {
               field.select(inputField.value);
             }
@@ -71,10 +71,17 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             break;
           }
           case "dropdown": {
+            const options = field.getOptions();
             if (inputField.index !== undefined) {
-              const opts = field.getOptions();
-              field.select(opts[inputField.index])
+              if (inputField.index < options.length) {
+                field.select(options[inputField.index]);
+              }
             } else {
+              if (!options.includes(inputField.value)) {
+                if (!field.isEditable()) {
+                  field.addOptions(inputField.value);
+                }
+              }
               field.select(inputField.value);
             }
             break;
@@ -95,7 +102,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
               const { context } = widget.dict;
               const { width, height } = widget.getRectangle();
 
-              const scl = pdfLibSigImg.scaleToFit(width, height)
+              const scl = pdfLibSigImg.scaleToFit(width, height);
               const appearance = [
                 ...drawImage(pdfLibSigImgName, {
                   x: 0,
