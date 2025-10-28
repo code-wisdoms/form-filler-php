@@ -88,7 +88,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
           }
           case "image": {
             let pdfLibSigImg = null;
-            if (inputField.mime == "image/jpg") {
+            if (inputField.mime == "image/jpg" || inputField.mime == "image/jpeg") {
               pdfLibSigImg = await pdfDoc.embedJpg(
                 Buffer.from(inputField.value, "base64")
               );
