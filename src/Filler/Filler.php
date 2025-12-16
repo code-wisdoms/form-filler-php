@@ -45,7 +45,7 @@ class Filler
             }
         }
     }
-    public function fill(string $file_path, array $data, bool $flatten = false, bool $hasDOSPage = false): string
+    public function fill(string $file_path, array $data, bool $flatten = false, bool $hasDOSPage = false, bool $removeButtons = false): string
     {
         $tempFile = tempnam(__DIR__ . '/../commands/', 'dt_');
         file_put_contents($tempFile, $this->encodeData($data));
@@ -59,6 +59,9 @@ class Filler
         }
         if ($hasDOSPage) {
             $command[] = '--hasDOSPage';
+        }
+        if ($removeButtons) {
+            $command[] = '--removeButtons';
         }
         $command[] = '-file';
         $command[] = $file_path;

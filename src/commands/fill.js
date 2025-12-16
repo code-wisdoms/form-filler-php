@@ -1,7 +1,7 @@
 const fs = require("fs");
 const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/utils/logger");
-const args = require(__dirname + "/utils/args");
+const args = require(__dirname + "/utils/args"); 
 const { degrees, drawImage } = require("pdf-lib");
 
 logger.info("New request for fill: " + JSON.stringify(process.argv));
@@ -28,17 +28,40 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
     const pdfBuffer = fs.readFileSync(opts.file);
     const pdfDoc = await pdfLib.PDFDocument.load(pdfBuffer);
     const form = pdfDoc.getForm();
+    const pages = pdfDoc.getPages();
 
     let inputs = [];
     try {
       const fileData = fs.readFileSync(opts.d);
       inputs = JSON.parse(fileData);
     } catch (error) {
-      logger.error("Unable to parse inputs");
+      logger.error(`Unable to parse inputs: ${error}`);
       process.exit(1);
     }
 
-    const fields = form.getFields();
+    const fields = form.getFields().filter(field => {
+      if (opts.removeButtons && field instanceof pdfLib.PDFButton) {
+        const widgets = field.acroField.getWidgets();
+        widgets.forEach(widget => {
+          const page = pages.find(p => p.ref === widget.P());
+
+          if (page) {
+            const padding = 3;
+            const { x, y, width, height } = widget.getRectangle();
+            page.drawRectangle({
+              x: x - padding,
+              y: y - padding,
+              width: width + (padding * 2),
+              height: height + (padding * 2),
+              color: pdfLib.rgb(1, 1, 1),
+            });
+          }
+        });
+        form.removeField(field);
+        return false;
+      }
+      return true;
+    });
 
     for (const field of fields) {
       try {

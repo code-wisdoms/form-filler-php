@@ -7,9 +7,9 @@ require '../../vendor/autoload.php';
 
 
 $data = [
-    'Employer Name' => ['type' => 'text', 'value' => $_GET['employer_name']],
-    'Is a certified interpreter required?' => ['type' => 'radio', 'value' => 'Yes'],
-    'Claims Administrator State (Required)' => ['type' => 'dropdown', 'value' => 'CA'],
+    'Document type' => ['type' => 'dropdown', 'value' => 'abc 123'],
+    'Document title' => ['type' => 'dropdown', 'value' => 'xyz 893'],
+    'Product delivery unit' => ['type' => 'dropdown', 'value' => 'ADJ'],
 ];
 $file_path = __DIR__ . "/forms/{$_GET['form']}.pdf";
 
@@ -17,7 +17,7 @@ $filler = new Filler();
 
 if (array_key_exists('fill', $_GET)) {
     try {
-        $pdfData = $filler->fill($file_path, $data, array_key_exists('flatten', $_GET));
+        $pdfData = $filler->fill($file_path, $data, array_key_exists('flatten', $_GET), true, array_key_exists('buttons', $_GET));
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="filled_form.pdf"');
         header('Content-Length: ' . strlen($pdfData));
