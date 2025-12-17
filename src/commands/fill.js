@@ -46,7 +46,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
           const page = pages.find(p => p.ref === widget.P());
 
           if (page) {
-            const padding = 3;
+            const padding = opts.btpad ?? 3;
             const { x, y, width, height } = widget.getRectangle();
             page.drawRectangle({
               x: x - padding,

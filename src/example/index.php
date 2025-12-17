@@ -17,7 +17,7 @@ $filler = new Filler();
 
 if (array_key_exists('fill', $_GET)) {
     try {
-        $pdfData = $filler->fill($file_path, $data, array_key_exists('flatten', $_GET), true, array_key_exists('buttons', $_GET));
+        $pdfData = $filler->fill($file_path, $data, array_key_exists('flatten', $_GET), true, array_key_exists('buttons', $_GET), @$_GET['btpad']);
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="filled_form.pdf"');
         header('Content-Length: ' . strlen($pdfData));

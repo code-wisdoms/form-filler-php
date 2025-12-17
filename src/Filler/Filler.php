@@ -45,7 +45,7 @@ class Filler
             }
         }
     }
-    public function fill(string $file_path, array $data, bool $flatten = false, bool $hasDOSPage = false, bool $removeButtons = false): string
+    public function fill(string $file_path, array $data, bool $flatten = false, bool $hasDOSPage = false, bool $removeButtons = false, ?int $buttonPadding = null): string
     {
         $tempFile = tempnam(__DIR__ . '/../commands/', 'dt_');
         file_put_contents($tempFile, $this->encodeData($data));
@@ -62,6 +62,13 @@ class Filler
         }
         if ($removeButtons) {
             $command[] = '--removeButtons';
+        }
+        if ($removeButtons) {
+            $command[] = '--removeButtons';
+        }
+        if ($buttonPadding !== null) {
+            $command[] = '-btpad';
+            $command[] = $buttonPadding;
         }
         $command[] = '-file';
         $command[] = $file_path;
