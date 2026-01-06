@@ -93,6 +93,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             }
             break;
           }
+          case "select":
           case "dropdown": {
             const options = field.getOptions();
             if (inputField.index !== undefined) {
@@ -109,6 +110,7 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             }
             break;
           }
+          case "signature":
           case "image": {
             let pdfLibSigImg = null;
             if (inputField.mime == "image/jpg" || inputField.mime == "image/jpeg") {
