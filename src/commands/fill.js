@@ -1,10 +1,43 @@
 const fs = require("fs");
 const pdfLib = require("pdf-lib");
 const logger = require(__dirname + "/utils/logger");
-const args = require(__dirname + "/utils/args"); 
+const args = require(__dirname + "/utils/args");
 const { degrees, drawImage } = require("pdf-lib");
 
 logger.info("New request for fill: " + JSON.stringify(process.argv));
+
+function removeLastPageAndFields(pdfDoc, form) {
+  const pages = pdfDoc.getPages();
+  const lastIndex = pdfDoc.getPageCount() - 1;
+  if (lastIndex < 0) return;
+
+  const lastPageRef = pages[lastIndex].ref;
+
+  // Remove fields whose widgets are on the last page
+  for (const f of form.getFields()) {
+    try {
+      const widgets = f.acroField?.getWidgets?.() ?? [];
+      const touchesLast = widgets.some((w) => {
+        try {
+          return w.P && w.P() === lastPageRef;
+        } catch {
+          return false;
+        }
+      });
+
+      if (touchesLast) form.removeField(f);
+    } catch {
+      // safest fallback
+      try {
+        form.removeField(f);
+      } catch (_) {}
+    }
+  }
+
+  // Remove the page
+  pdfDoc.removePage(lastIndex);
+}
+
 (async () => {
   try {
     const opts = args();
@@ -39,11 +72,11 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
       process.exit(1);
     }
 
-    const fields = form.getFields().filter(field => {
+    const fields = form.getFields().filter((field) => {
       if (opts.removeButtons && field instanceof pdfLib.PDFButton) {
         const widgets = field.acroField.getWidgets();
-        widgets.forEach(widget => {
-          const page = pages.find(p => p.ref === widget.P());
+        widgets.forEach((widget) => {
+          const page = pages.find((p) => p.ref === widget.P());
 
           if (page) {
             const padding = opts.btpad ?? 3;
@@ -51,8 +84,8 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
             page.drawRectangle({
               x: x - padding,
               y: y - padding,
-              width: width + (padding * 2),
-              height: height + (padding * 2),
+              width: width + padding * 2,
+              height: height + padding * 2,
               color: pdfLib.rgb(1, 1, 1),
             });
           }
@@ -113,7 +146,10 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
           case "signature":
           case "image": {
             let pdfLibSigImg = null;
-            if (inputField.mime == "image/jpg" || inputField.mime == "image/jpeg") {
+            if (
+              inputField.mime == "image/jpg" ||
+              inputField.mime == "image/jpeg"
+            ) {
               pdfLibSigImg = await pdfDoc.embedJpg(
                 Buffer.from(inputField.value, "base64")
               );
@@ -162,9 +198,10 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
     }
 
     if (opts.flatten) {
-      if (!opts.hasDOSPage) {
+      if (opts.removeDOSPage) {
         form.flatten();
-      } else {
+        removeLastPageAndFields(pdfDoc, form);
+      } else if (opts.hasDOSPage) {
         const pageCount = pdfDoc.getPageCount();
         const [dosPage] = await pdfDoc.copyPages(pdfDoc, [pageCount - 1]);
         pdfDoc.removePage(pageCount - 1);
@@ -172,6 +209,8 @@ logger.info("New request for fill: " + JSON.stringify(process.argv));
         form.flatten();
 
         pdfDoc.addPage(dosPage);
+      } else {
+        form.flatten();
       }
     }
 
