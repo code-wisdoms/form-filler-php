@@ -214,7 +214,7 @@ function removeLastPageAndFields(pdfDoc, form) {
       }
     }
 
-    process.stdout.write(await pdfDoc.save({ updateFieldAppearances: false }));
+    process.stdout.write(await pdfDoc.save({ updateFieldAppearances: true }));
   } catch (error) {
     logger.error(`Error: ${error}`);
     process.exit(1);
