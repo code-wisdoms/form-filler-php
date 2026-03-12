@@ -25,28 +25,34 @@ logger.info("New request for fields: " + JSON.stringify(process.argv));
       const name = field.getName();
       let type = "unknown";
       let values = [];
+      let value = null;
 
       if (field instanceof pdfLib.PDFTextField) {
         type = "text";
+        value = field.getText();
       } else if (field instanceof pdfLib.PDFCheckBox) {
         type = "checkbox";
+        value = field.isChecked();
       } else if (field instanceof pdfLib.PDFDropdown) {
         type = "select";
         values = field.getOptions();
+        value = field.getSelected();
       } else if (field instanceof pdfLib.PDFRadioGroup) {
         type = "radio";
         values = field.getOptions();
+        value = field.getSelected();
       } else if (field instanceof pdfLib.PDFButton) {
         type = "button";
       } else if (field instanceof pdfLib.PDFOptionList) {
         values = field.getOptions();
         type = "multi-select";
+        value = field.getSelected();
       } else if (field instanceof pdfLib.PDFSignature) {
         type = "signature";
       } else {
         type = field.constructor.name;
       }
-      return { name, type, values };
+      return { name, type, values, value };
     });
     process.stdout.write(JSON.stringify(data));
   } catch (error) {
